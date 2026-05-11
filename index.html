@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Electricista profesional en Santiago. Servicios residenciales, comerciales y emergencias 24/7. Rápido, seguro y confiable." />
+  <meta name="keywords" content="electricista, servicios eléctricos, electricista residencial, electricista comercial, emergencias eléctricas, Región Metropolitana" />
+  <meta name="author" content="Electricista Profesional" />
+  <title>Electricista Profesional | Servicios Eléctricos en Santiago</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <img src="images/Sol_Elec_logo.png" alt="Sol Elec logo" class="logo-image">
+      </div>
+      <a class="phone-link desktop-call" href="tel:+56963696592">Llama ahora</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Servicio local 24/7</p>
+          <h2>Diagnóstico y solución de fallas eléctricas y control industrial</h2>
+          <p>Encuentro la causa de la falla y dejo tu sistema funcionando de forma estable, segura y confiable. Atención profesional en Santiago para instalaciones, mantenimientos y emergencias. Técnicos certificados y trabajo garantizado.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="tel:+56963696592">Llamanos</a>
+            <a class="button button-whatsapp" href="https://wa.me/56963696592?text=Hola,%20tengo%20una%20falla%20en%20">Habla con un especialista por Whatsapp</a>
+            <a class="button button-secondary" href="#contacto">Agenda tu diagnóstico</a>
+          </div>
+        </div>
+        <div class="hero-image">
+          <div class="carousel" aria-label="Carrusel de trabajos eléctricos">
+            <div class="carousel-track">
+              <div class="carousel-slide">
+                <img src="images/TDA.jpeg" alt="Instalación eléctrica en proceso" />
+              </div>
+              <div class="carousel-slide">
+                <img src="images/Sala_Bombas.jpeg" alt="Sala de bombas con instalaciones eléctricas" />
+              </div>
+              <div class="carousel-slide">
+                <img src="images/Clorador.jpeg" alt="Sistema de cloración con cableado seguro" />
+              </div>
+              <div class="carousel-slide">
+                <img src="images/Sala_Elec.jpeg" alt="Sala eléctrica profesional" />
+              </div>
+              <div class="carousel-slide">
+                <img src="images/TDFyC.jpeg" alt="Equipo eléctrico TDFyC" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="problems container">
+      <p class="eyebrow">Diagnóstico</p>
+      <h2>¿Tu sistema presenta alguno de estos problemas?</h2>
+      <form class="problems-form">
+        <div class="problems-grid">
+          <label class="problem-item">
+            <input type="checkbox" class="problem-checkbox" />
+            <div class="problem-icon">⚡</div>
+            <div class="problem-content">
+              <h4>Disparo de protecciones eléctricas</h4>
+              <p>Interrupciones frecuentes en tu suministro eléctrico.</p>
+              <small class="problem-risk">Riesgo: Cortocircuitos e incendios eléctricos.</small>
+            </div>
+          </label>
+          <label class="problem-item">
+            <input type="checkbox" class="problem-checkbox" />
+            <div class="problem-icon">🔌</div>
+            <div class="problem-content">
+              <h4>Falla en equipos</h4>
+              <p>Electrodomésticos o equipos que no funcionan correctamente.</p>
+              <small class="problem-risk">Riesgo: Daño progresivo de electrodomésticos costosos.</small>
+            </div>
+          </label>
+          <label class="problem-item">
+            <input type="checkbox" class="problem-checkbox" />
+            <div class="problem-icon">⏳</div>
+            <div class="problem-content">
+              <h4>Sistemas antiguos difíciles de mantener</h4>
+              <p>Instalaciones antiguas que requieren mantenimiento o actualización.</p>
+              <small class="problem-risk">Riesgo: Mayor consumo energético e ineficiencia operativa.</small>
+            </div>
+          </label>
+          <label class="problem-item">
+            <input type="checkbox" class="problem-checkbox" />
+            <div class="problem-icon">📋</div>
+            <div class="problem-content">
+              <h4>Tableros sin documentación o mal diseñados</h4>
+              <p>Sistemas sin planos o caóticos que dificultan el trabajo.</p>
+              <small class="problem-risk">Riesgo: Aumenta costos de reparación por pérdida de tiempo diagnóstico.</small>
+            </div>
+          </label>
+          <label class="problem-item">
+            <input type="checkbox" class="problem-checkbox" />
+            <div class="problem-icon">🏭</div>
+            <div class="problem-content">
+              <h4>Problemas con bombas, motores e industria</h4>
+              <p>Fallas en sistemas de automatización y control industrial.</p>
+              <small class="problem-risk">Riesgo: Paro de producción con pérdidas económicas significativas.</small>
+            </div>
+          </label>
+        </div>
+        <div class="problems-action">
+          <button type="button" class="button button-primary" onclick="handleDiagnosis()">
+            Tengo uno o más de estos problemas. Necesito una evaluación
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="services container" id="servicios">
+      <p class="eyebrow">Servicios</p>
+      <h2>Servicios especializados en ditribución y control eléctrico</h2>
+      <div class="service-grid">
+        <article class="service-card">
+          <h3>Diagnóstico de fallas eléctricas</h3>
+          <p>Identificación y corrección de fallas complejas en sistemas eléctricos industriales y de control.</p>
+        </article>
+        <article class="service-card">
+          <h3>Programación de PLC, HMI y automatización</h3>
+          <p>Desarrollo, modificación y optimización de lógica de control para procesos industriales.</p>
+        </article>
+        <article class="service-card">
+          <h3>Configuración de variadores de frecuencia</h3>
+          <p>Puesta en marcha, parametrización y diagnóstico de VDF en aplicaciones industriales.</p>
+        </article>
+        <article class="service-card">
+          <h3>Diseño y mejora de tableros eléctricos</h3>
+          <p>Fabricación, ordenamiento y optimización de tableros de fuerza y control.</p>
+        </article>
+        <article class="service-card">
+          <h3>Integración de sistemas industriales</h3>
+          <p>Comunicación e integración entre PLC, HMI, sensores, variadores y sistemas SCADA.</p>
+        </article>
+        <article class="service-card">
+          <h3>Puesta en marcha y soporte técnico</h3>
+          <p>Asistencia técnica en terreno para pruebas, arranque y estabilización de sistemas.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="before-after">
+      <div class="container">
+        <p class="eyebrow">Consulte por nuestros servicios</p>
+        <h2>Soluciones eléctricas para su proyecto</h2>
+        <div class="before-after-grid">
+          <div class="panel panel-before">
+            <h3>Remodelaciones y normalización eléctricas</h3>
+            <p>Renovamos instalaciones para cumplir con normas y mejorar la seguridad de su hogar o empresa.</p>
+          </div>
+          <div class="panel panel-after">
+            <h3>Proyectos y certificaciones TE1</h3>
+            <p>Diseño y ejecución de proyectos eléctricos certificados según la normativa vigente.</p>
+          </div>
+          <div class="panel panel-before">
+            <h3>Proyectos de control eléctrico para bombas y HVAC</h3>
+            <p>Sistemas de automatización y control para bombas, climatización y equipos industriales.</p>
+          </div>
+          <div class="panel panel-after">
+            <h3>Planes de mantenimiento</h3>
+            <p>Programas periódicos para mantener su instalación segura, eficiente y funcionando sin problemas.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="reviews container" id="reseñas">
+      <p class="eyebrow">Reseñas</p>
+      <h2>Clientes satisfechos en la Región Metropolitana</h2>
+      <div class="review-grid">
+        <article class="review-card">
+          <p>“Excelente servicio. Llegaron rápido y resolvieron todo con profesionalismo. Totalmente recomendado.”</p>
+          <span>— María R.</span>
+        </article>
+        <article class="review-card">
+          <p>“Nuestro local quedó con una instalación segura y moderna. Muy buenos consejos y limpieza al terminar.”</p>
+          <span>— Juan P.</span>
+        </article>
+        <article class="review-card">
+          <p>“Atención 24 horas en emergencia, solucionaron un corto en menos de una hora. Un servicio impecable.”</p>
+          <span>— Laura S.</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="contact container" id="contacto">
+      <div class="contact-grid">
+        <div>
+          <p class="eyebrow">Contacto</p>
+          <h2>Solicita tu revisión eléctrica hoy</h2>
+          <p>Completa el formulario y nos comunicaremos contigo para agendar una visita rápida en tu zona.</p>
+          <div class="contact-details">
+            <p><strong>Teléfono:</strong> <a href="tel:+56963696592">+56 9 636 96592</a></p>
+            <p><strong>Ubicación:</strong> Santiago, Región Metropolitana</p>
+          </div>
+        </div>
+        <form class="contact-form" action="https://docs.google.com/forms/d/e/1FAIpQLSdugPRH-Kz9HpvTN1qVgBoM1DXWUp9fiHr8EJO1XIlXHhiqpg/formResponse" method="post" target="_blank">
+          <label for="nombre">Nombre</label>
+          <input type="text" id="nombre" name="entry.182788441" placeholder="Tu nombre" required />
+
+          <label for="telefono">Teléfono</label>
+          <input type="tel" id="telefono" name="entry.1556620969" placeholder="Tu número" required />
+
+          <label for="email">Correo</label>
+          <input type="email" id="email" name="entry.1659894845" placeholder="Tu email" required />
+
+          <label for="mensaje">Servicio requerido</label>
+          <textarea id="mensaje" name="entry.1396817873" rows="5" placeholder="Describe tu problema" required></textarea>
+
+          <button class="button button-primary" type="submit">Enviar solicitud</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>Atención rápida y segura</p>
+      <a href="tel:+56963696592">+56 9 636 96592</a>
+    </div>
+  </footer>
+
+  <a class="sticky-call" href="tel:+56963696592">Llama ahora</a>
+
+  <script>
+    function handleDiagnosis() {
+      const checkboxes = document.querySelectorAll('.problem-checkbox:checked');
+      const problems = Array.from(checkboxes).map(cb => {
+        return cb.parentElement.querySelector('h4').textContent.trim();
+      });
+      
+      let message = 'Hola, tengo uno o más de estos problemas eléctricos y necesito una evaluación: ';
+      if (problems.length > 0) {
+        message += problems.join(', ');
+      } else {
+        message += 'Tengo problemas eléctricos y necesito ayuda.';
+      }
+      
+      const whatsappUrl = `https://wa.me/56963696592?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+    }
+  </script>
+</body>
+</html>
