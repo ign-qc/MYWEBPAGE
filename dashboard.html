@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard IoT - Monitoreo Energético</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      background: #eef4ff;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 2rem 0 1rem;
+    }
+
+    .dashboard-header h1 {
+      margin: 0;
+      font-size: clamp(2rem, 3vw, 2.8rem);
+      line-height: 1.05;
+    }
+
+    .dashboard-header p {
+      margin: 0.5rem 0 0;
+      color: #4a5d79;
+      max-width: 36rem;
+    }
+
+    .button {
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+
+    .button-secondary {
+      background: rgba(29, 78, 216, 0.08);
+      color: #1d4ed8;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: 1.4fr 0.6fr;
+      align-items: start;
+      padding-bottom: 3rem;
+    }
+
+    .panel-card,
+    .overview-card {
+      background: #ffffff;
+      border: 1px solid rgba(29, 78, 216, 0.12);
+      border-radius: 24px;
+      box-shadow: 0 28px 70px rgba(31, 64, 125, 0.08);
+      padding: 1.75rem;
+    }
+
+    .panel-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
+
+    .status-card {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .status-card > div {
+      background: rgba(29, 78, 216, 0.08);
+      border-radius: 18px;
+      padding: 1rem;
+    }
+
+    .status-card strong,
+    .metric-card strong,
+    .info-card strong {
+      display: block;
+      margin-bottom: 0.35rem;
+      color: #14213d;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .metric-card {
+      background: linear-gradient(180deg, #ffffff 0%, #f3f8ff 100%);
+      border: 1px solid rgba(29, 78, 216, 0.12);
+      border-radius: 22px;
+      padding: 1.25rem;
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .chart-card {
+      background: #ffffff;
+      border: 1px solid rgba(29, 78, 216, 0.12);
+      border-radius: 22px;
+      padding: 1.35rem;
+      box-shadow: 0 18px 40px rgba(31, 64, 125, 0.06);
+    }
+
+    .chart-card h3 {
+      margin: 0 0 0.85rem;
+      font-size: 1rem;
+      color: #14213d;
+    }
+
+    .chart-card canvas {
+      width: 100% !important;
+      height: 260px !important;
+    }
+
+    .metric-card span {
+      font-size: 1.8rem;
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+
+    .info-card {
+      display: grid;
+      gap: 1rem;
+      background: #f8fbff;
+      border: 1px solid rgba(29, 78, 216, 0.12);
+      border-radius: 20px;
+      padding: 1.5rem;
+    }
+
+    .input-row {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .input-row label {
+      font-weight: 700;
+      color: #14213d;
+    }
+
+    .input-row input {
+      width: 100%;
+      padding: 0.95rem 1rem;
+      border-radius: 14px;
+      border: 1px solid #dbe6f5;
+      background: white;
+      font-size: 1rem;
+      color: #14213d;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.15rem;
+      border-radius: 16px;
+      background: white;
+      border: 1px solid rgba(29, 78, 216, 0.08);
+    }
+
+    .info-item strong {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 540px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 0.95rem 0.85rem;
+      border-bottom: 1px solid #eef4ff;
+    }
+
+    th {
+      font-size: 0.9rem;
+      color: #4a5d79;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    td {
+      font-size: 0.96rem;
+      color: #14213d;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    .badge.success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge.warning {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .dashboard-footer {
+      padding: 1rem 0 2rem;
+      color: #4a5d79;
+      text-align: center;
+    }
+
+    @media (max-width: 900px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="dashboard-header">
+      <div>
+        <span class="eyebrow">Monitoreo Energético</span>
+        <h1>Panel de Control</h1>
+        <p>Visualiza potencia activa, reactiva, aparente, factor de potencia, THD, energía y costos en tiempo real.</p>
+      </div>
+      <button class="button button-secondary" onclick="logout()">Cerrar sesión</button>
+    </header>
+
+    <main class="dashboard-grid">
+      <section class="overview-card">
+        <div class="status-card">
+          <div>
+            <strong>Última actualización</strong>
+            <span id="updatedAt">Cargando...</span>
+          </div>
+          <div>
+            <strong>Estado del sistema</strong>
+            <span id="statusLabel"><span class="badge success">Cargando</span></span>
+          </div>
+        </div>
+
+        <div class="metric-grid">
+          <div class="metric-card">
+            <strong>Potencia Activa</strong>
+            <span id="potenciaActiva">-- kW</span>
+          </div>
+          <div class="metric-card">
+            <strong>Potencia Reactiva</strong>
+            <span id="potenciaReactiva">-- kVAR</span>
+          </div>
+          <div class="metric-card">
+            <strong>Potencia Aparente</strong>
+            <span id="potenciaAparente">-- kVA</span>
+          </div>
+          <div class="metric-card">
+            <strong>Factor de Potencia</strong>
+            <span id="factorPotencia">--</span>
+          </div>
+          <div class="metric-card">
+            <strong>THD</strong>
+            <span id="thd">-- %</span>
+          </div>
+          <div class="metric-card">
+            <strong>Energía Consumida</strong>
+            <span id="energiaConsumida">-- kWh</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel-card">
+        <div class="panel-header">
+          <h2>Costos y multas</h2>
+        </div>
+
+        <div>
+          <div class="input-row">
+            <label for="precioKwh">Precio del kWh</label>
+            <input id="precioKwh" type="number" min="0" step="10" value="150" />
+          </div>
+
+          <div class="info-card">
+            <div class="info-item">
+              <strong>Consumo actual</strong>
+              <span id="energyValue">-- kWh</span>
+            </div>
+            <div class="info-item">
+              <strong>Costo estimado</strong>
+              <span id="totalCost">-- CLP</span>
+            </div>
+            <div class="info-item">
+              <strong>Multa factor de potencia</strong>
+              <span id="penaltyPF">--</span>
+            </div>
+            <div class="info-item">
+              <strong>Multa THD</strong>
+              <span id="penaltyTHD">--</span>
+            </div>
+            <div class="info-item">
+              <strong>Costo total proyectado</strong>
+              <span id="finalCost">-- CLP</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel-card" style="grid-column: 1 / -1;">
+        <div class="panel-header">
+          <h2>Gráficos de tendencias</h2>
+        </div>
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Potencias activas y reactivas</h3>
+            <canvas id="powerChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Factor de potencia, THD y energía</h3>
+            <canvas id="qualityChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel-card" style="grid-column: 1 / -1;">
+        <div class="panel-header">
+          <h2>Últimas mediciones</h2>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Dispositivo</th>
+                <th>Variable</th>
+                <th>Valor</th>
+                <th>Unidad</th>
+              </tr>
+            </thead>
+            <tbody id="historyTable">
+              <tr><td colspan="5">Cargando mediciones...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="dashboard-footer">
+      <p>Datos de energía actualizados automáticamente cada 10 segundos.</p>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script>
+    const SUPABASE_URL = "https://jtawcsvmureizbwzqvhk.supabase.co";
+    const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0YXdjc3ZtdXJlaXpid3pxdmhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjgwMjAsImV4cCI6MjA5NDQ0NDAyMH0.wm3YK_NKppT6wB7f_TwJNiEugccQWkbiNxiAn_rGGIA";
+
+    const supabaseClient = (() => {
+      if (window.supabase && typeof window.supabase.createClient === "function") {
+        return window.supabase.createClient(SUPABASE_URL, API_KEY);
+      }
+      if (typeof window.createClient === "function") {
+        return window.createClient(SUPABASE_URL, API_KEY);
+      }
+      return null;
+    })();
+
+    const metrics = {
+      potenciaActiva: "P_ACT",
+      potenciaReactiva: "P_REACT",
+      potenciaAparente: "P_APP",
+      factorPotencia: "FP",
+      thd: "THD",
+      energiaConsumida: "E_ACT"
+    };
+
+    function formatNumber(value, decimals = 2) {
+      if (value === null || value === undefined || Number.isNaN(value)) return "--";
+      return Number(value).toLocaleString("es-CL", { minimumFractionDigits: 0, maximumFractionDigits: decimals });
+    }
+
+    function formatCost(value) {
+      if (value === null || value === undefined || Number.isNaN(value)) return "-- CLP";
+      return Number(value).toLocaleString("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 });
+    }
+
+    function getMetricValue(records, tag) {
+      const match = records.find(r => r.tag === tag);
+      return match ? Number(match.valor) : null;
+    }
+
+    function getStatusLabel(values) {
+      if (values.potenciaActiva === null && values.energiaConsumida === null) return "Sin datos";
+      if (values.factorPotencia !== null && values.factorPotencia < 0.9) return "Atención: Factor bajo";
+      if (values.thd !== null && values.thd > 5) return "Atención: THD alto";
+      return "Estable";
+    }
+
+    function updateCostView(values) {
+      const price = Number(document.getElementById("precioKwh").value);
+      const energy = values.energiaConsumida ?? 0;
+      const baseCost = energy * price;
+      const penaltyPF = values.factorPotencia !== null && values.factorPotencia < 0.9 ? baseCost * 0.08 : 0;
+      const penaltyTHD = values.thd !== null && values.thd > 5 ? baseCost * 0.05 : 0;
+      const totalCost = baseCost + penaltyPF + penaltyTHD;
+
+      document.getElementById("energyValue").textContent = `${formatNumber(energy, 2)} kWh`;
+      document.getElementById("totalCost").textContent = formatCost(baseCost);
+      document.getElementById("penaltyPF").textContent = penaltyPF > 0 ? formatCost(penaltyPF) : "No aplica";
+      document.getElementById("penaltyTHD").textContent = penaltyTHD > 0 ? formatCost(penaltyTHD) : "No aplica";
+      document.getElementById("finalCost").textContent = formatCost(totalCost);
+    }
+
+    function renderMetrics(values) {
+      document.getElementById("potenciaActiva").textContent = values.potenciaActiva !== null ? `${formatNumber(values.potenciaActiva, 2)} kW` : "-- kW";
+      document.getElementById("potenciaReactiva").textContent = values.potenciaReactiva !== null ? `${formatNumber(values.potenciaReactiva, 2)} kVAR` : "-- kVAR";
+      document.getElementById("potenciaAparente").textContent = values.potenciaAparente !== null ? `${formatNumber(values.potenciaAparente, 2)} kVA` : "-- kVA";
+      document.getElementById("factorPotencia").textContent = values.factorPotencia !== null ? formatNumber(values.factorPotencia, 3) : "--";
+      document.getElementById("thd").textContent = values.thd !== null ? `${formatNumber(values.thd, 2)} %` : "-- %";
+      document.getElementById("energiaConsumida").textContent = values.energiaConsumida !== null ? `${formatNumber(values.energiaConsumida, 2)} kWh` : "-- kWh";
+      document.getElementById("updatedAt").textContent = new Date().toLocaleString("es-CL");
+      const status = getStatusLabel(values);
+      const badgeType = values.factorPotencia !== null && values.factorPotencia < 0.9 ? "warning" : values.thd !== null && values.thd > 5 ? "warning" : "success";
+      document.getElementById("statusLabel").innerHTML = `<span class="badge ${badgeType}">${status}</span>`;
+    }
+
+    function renderHistory(records) {
+      const body = document.getElementById("historyTable");
+      if (!records || records.length === 0) {
+        body.innerHTML = `<tr><td colspan="5">No se encontraron mediciones.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = records.map(record => {
+        const date = new Date(record.fecha).toLocaleString("es-CL");
+        const variable = record.variable || "-";
+        const unit = record.unidad || "";
+        return `
+          <tr>
+            <td>${date}</td>
+            <td>${record.dispositivo || "-"}</td>
+            <td>${variable}</td>
+            <td>${record.valor ?? "-"}</td>
+            <td>${unit}</td>
+          </tr>`;
+      }).join("");
+    }
+
+    const chartConfig = {
+      powerChart: null,
+      qualityChart: null
+    };
+
+    function buildChartData(records, tag) {
+      return [...records]
+        .filter(record => record.tag === tag)
+        .reverse()
+        .map(record => Number(String(record.valor).replace(",", ".")));
+    }
+
+    function buildLabels(records, tag) {
+      return [...records]
+        .filter(record => record.tag === tag)
+        .reverse()
+        .map(record => new Date(record.fecha).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
+    }
+
+    function createChart(chartId, datasets, labels) {
+      const ctx = document.getElementById(chartId).getContext("2d");
+      return new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: "index",
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              labels: {
+                color: "#14213d"
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: ctx => `${ctx.dataset.label}: ${ctx.formattedValue}`
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: {
+                color: "#4a5d79"
+              },
+              grid: {
+                color: "rgba(29, 78, 216, 0.08)"
+              }
+            },
+            y: {
+              ticks: {
+                color: "#4a5d79"
+              },
+              grid: {
+                color: "rgba(29, 78, 216, 0.08)"
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateCharts(records) {
+      const labelsPower = buildLabels(records, metrics.potenciaActiva);
+      const labelsQuality = buildLabels(records, metrics.factorPotencia);
+      const powerDatasets = [
+        {
+          label: "Potencia Activa",
+          data: buildChartData(records, metrics.potenciaActiva),
+          borderColor: "#1d4ed8",
+          backgroundColor: "rgba(29, 78, 216, 0.12)",
+          tension: 0.35,
+          fill: true
+        },
+        {
+          label: "Potencia Reactiva",
+          data: buildChartData(records, metrics.potenciaReactiva),
+          borderColor: "#2563eb",
+          backgroundColor: "rgba(37, 99, 235, 0.12)",
+          tension: 0.35,
+          fill: true
+        },
+        {
+          label: "Potencia Aparente",
+          data: buildChartData(records, metrics.potenciaAparente),
+          borderColor: "#3b82f6",
+          backgroundColor: "rgba(59, 130, 246, 0.12)",
+          tension: 0.35,
+          fill: true
+        }
+      ];
+
+      const qualityDatasets = [
+        {
+          label: "Factor de Potencia",
+          data: buildChartData(records, metrics.factorPotencia),
+          borderColor: "#0f766e",
+          backgroundColor: "rgba(15, 118, 110, 0.12)",
+          tension: 0.35,
+          fill: true
+        },
+        {
+          label: "THD",
+          data: buildChartData(records, metrics.thd),
+          borderColor: "#b45309",
+          backgroundColor: "rgba(180, 83, 9, 0.12)",
+          tension: 0.35,
+          fill: true
+        },
+        {
+          label: "Energía Consumida",
+          data: buildChartData(records, metrics.energiaConsumida),
+          borderColor: "#14b8a6",
+          backgroundColor: "rgba(20, 184, 166, 0.12)",
+          tension: 0.35,
+          fill: true
+        }
+      ];
+
+      if (chartConfig.powerChart) {
+        chartConfig.powerChart.data.labels = labelsPower;
+        chartConfig.powerChart.data.datasets = powerDatasets;
+        chartConfig.powerChart.update();
+      } else {
+        chartConfig.powerChart = createChart("powerChart", powerDatasets, labelsPower);
+      }
+
+      if (chartConfig.qualityChart) {
+        chartConfig.qualityChart.data.labels = labelsQuality;
+        chartConfig.qualityChart.data.datasets = qualityDatasets;
+        chartConfig.qualityChart.update();
+      } else {
+        chartConfig.qualityChart = createChart("qualityChart", qualityDatasets, labelsQuality);
+      }
+    }
+
+    async function checkSession() {
+      if (!supabaseClient || !supabaseClient.auth) {
+        window.location.href = "iot-login.html";
+        return false;
+      }
+      const { data } = await supabaseClient.auth.getSession();
+      if (!data.session) {
+        window.location.href = "iot-login.html";
+        return false;
+      }
+      return true;
+    }
+
+    async function obtenerDatos() {
+      if (!supabaseClient) {
+        document.getElementById("updatedAt").textContent = "Error de conexión";
+        return;
+      }
+
+      const { data, error } = await supabaseClient
+        .from("mediciones")
+        .select("*")
+        .order("fecha", { ascending: false })
+        .limit(50);
+
+      if (error) {
+        document.getElementById("statusLabel").textContent = "Error al cargar datos";
+        document.getElementById("historyTable").innerHTML = `<tr><td colspan=\"5\">${error.message}</td></tr>`;
+        return;
+      }
+
+      const values = {
+        potenciaActiva: getMetricValue(data, metrics.potenciaActiva),
+        potenciaReactiva: getMetricValue(data, metrics.potenciaReactiva),
+        potenciaAparente: getMetricValue(data, metrics.potenciaAparente),
+        factorPotencia: getMetricValue(data, metrics.factorPotencia),
+        thd: getMetricValue(data, metrics.thd),
+        energiaConsumida: getMetricValue(data, metrics.energiaConsumida)
+      };
+
+      renderMetrics(values);
+      updateCostView(values);
+      renderHistory(data.slice(0, 12));
+      updateCharts(data);
+    }
+
+    async function logout() {
+      if (supabaseClient && supabaseClient.auth && typeof supabaseClient.auth.signOut === "function") {
+        await supabaseClient.auth.signOut();
+      }
+      window.location.href = "iot-login.html";
+    }
+
+    document.getElementById("precioKwh").addEventListener("input", () => {
+      const values = {
+        energiaConsumida: Number(document.getElementById("energiaConsumida").textContent.replace(/[^0-9.-]+/g, "")) || 0,
+        factorPotencia: Number(document.getElementById("factorPotencia").textContent.replace(/[^0-9.-]+/g, "")) || null,
+        thd: Number(document.getElementById("thd").textContent.replace(/[^0-9.-]+/g, "")) || null
+      };
+      updateCostView(values);
+    });
+
+    async function init() {
+      const valid = await checkSession();
+      if (!valid) return;
+      await obtenerDatos();
+      setInterval(obtenerDatos, 10000);
+    }
+
+    init();
+  </script>
+</body>
+</html>
