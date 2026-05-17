@@ -429,7 +429,8 @@
     }
 
     function getMetricValue(records, tag) {
-      const match = records.find(r => r.tag === tag);
+      if (!records || records.length === 0) return null;
+      const match = records.find(r => r.tag && String(r.tag).trim().toUpperCase() === String(tag).trim().toUpperCase());
       return match ? Number(match.valor) : null;
     }
 
@@ -463,6 +464,7 @@
       document.getElementById("thd").textContent = values.thd !== null ? `${formatNumber(values.thd, 2)} %` : "-- %";
       document.getElementById("energiaConsumida").textContent = values.energiaConsumida !== null ? `${formatNumber(values.energiaConsumida, 2)} kWh` : "-- kWh";
       document.getElementById("updatedAt").textContent = new Date().toLocaleString("es-CL");
+      
       const status = getStatusLabel(values);
       const badgeType = values.factorPotencia !== null && values.factorPotencia < 0.9 ? "warning" : values.thd !== null && values.thd > 5 ? "warning" : "success";
       document.getElementById("statusLabel").innerHTML = `<span class="badge ${badgeType}">${status}</span>`;
@@ -496,63 +498,44 @@
     };
 
     function buildChartData(records, tag) {
-      return [...records]
-        .filter(record => record.tag === tag)
-        .reverse()
-        .map(record => Number(String(record.valor).replace(",", ".")));
+      if (!records) return [];
+      return records
+        .filter(record => record.tag && String(record.tag).trim().toUpperCase() === String(tag).trim().toUpperCase())
+        .map(record => {
+          const num = parseFloat(String(record.valor).replace(",", "."));
+          return isNaN(num) ? 0 : num;
+        })
+        .reverse();
     }
 
     function buildLabels(records, tag) {
-      return [...records]
-        .filter(record => record.tag === tag)
-        .reverse()
-        .map(record => new Date(record.fecha).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
+      if (!records) return [];
+      return records
+        .filter(record => record.tag && String(record.tag).trim().toUpperCase() === String(tag).trim().toUpperCase())
+        .map(record => {
+          const dateObj = new Date(record.fecha);
+          if (isNaN(dateObj.getTime())) return new Date().toLocaleTimeString("es-CL");
+          return dateObj.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+        })
+        .reverse();
     }
 
     function createChart(chartId, datasets, labels) {
       const ctx = document.getElementById(chartId).getContext("2d");
       return new Chart(ctx, {
         type: "line",
-        data: {
-          labels,
-          datasets
-        },
+        data: { labels, datasets },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          interaction: {
-            mode: "index",
-            intersect: false
-          },
+          interaction: { mode: "index", intersect: false },
           plugins: {
-            legend: {
-              labels: {
-                color: "#14213d"
-              }
-            },
-            tooltip: {
-              callbacks: {
-                label: ctx => `${ctx.dataset.label}: ${ctx.formattedValue}`
-              }
-            }
+            legend: { labels: { color: "#14213d" } },
+            tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.formattedValue}` } }
           },
           scales: {
-            x: {
-              ticks: {
-                color: "#4a5d79"
-              },
-              grid: {
-                color: "rgba(29, 78, 216, 0.08)"
-              }
-            },
-            y: {
-              ticks: {
-                color: "#4a5d79"
-              },
-              grid: {
-                color: "rgba(29, 78, 216, 0.08)"
-              }
-            }
+            x: { ticks: { color: "#4a5d79" }, grid: { color: "rgba(29, 78, 216, 0.08)" } },
+            y: { ticks: { color: "#4a5d79" }, grid: { color: "rgba(29, 78, 216, 0.08)" } }
           }
         }
       });
@@ -561,6 +544,7 @@
     function updateCharts(records) {
       const labelsPower = buildLabels(records, metrics.potenciaActiva);
       const labelsQuality = buildLabels(records, metrics.factorPotencia);
+
       const powerDatasets = [
         {
           label: "Potencia Activa",
@@ -651,15 +635,24 @@
         return;
       }
 
+      // Descargamos un volumen mayor (150) para garantizar que entren todos los tipos de variables recientes
       const { data, error } = await supabaseClient
         .from("mediciones")
         .select("*")
         .order("fecha", { ascending: false })
-        .limit(50);
+        .limit(150);
 
       if (error) {
+        console.error("Error al obtener datos:", error);
         document.getElementById("statusLabel").textContent = "Error al cargar datos";
-        document.getElementById("historyTable").innerHTML = `<tr><td colspan=\"5\">${error.message}</td></tr>`;
+        document.getElementById("historyTable").innerHTML = `<tr><td colspan="5">${error.message}</td></tr>`;
+        return;
+      }
+
+      console.log("Datos recibidos de Supabase:", data);
+
+      if (!data || data.length === 0) {
+        document.getElementById("statusLabel").innerHTML = `<span class="badge warning">Tabla sin datos</span>`;
         return;
       }
 
@@ -697,6 +690,7 @@
     async function init() {
       const valid = await checkSession();
       if (!valid) return;
+      
       await obtenerDatos();
       setInterval(obtenerDatos, 10000);
     }
