@@ -530,7 +530,7 @@
           maintainAspectRatio: false,
           interaction: { mode: "index", intersect: false },
           plugins: {
-            legend: { labels: { color: "#14213d" } },
+            legend: { labels: { color: "#14213d", font: { weight: 'bold' } } },
             tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.formattedValue}` } }
           },
           scales: {
@@ -545,30 +545,31 @@
       const labelsPower = buildLabels(records, metrics.potenciaActiva);
       const labelsQuality = buildLabels(records, metrics.factorPotencia);
 
+      // Paleta limpia, distinguible y SIN relleno inferior
       const powerDatasets = [
         {
           label: "Potencia Activa",
           data: buildChartData(records, metrics.potenciaActiva),
-          borderColor: "#1d4ed8",
-          backgroundColor: "rgba(29, 78, 216, 0.12)",
-          tension: 0.35,
-          fill: true
+          borderColor: "#dc2626", // Rojo vivo
+          borderWidth: 3,
+          tension: 0.2,
+          fill: false
         },
         {
           label: "Potencia Reactiva",
           data: buildChartData(records, metrics.potenciaReactiva),
-          borderColor: "#2563eb",
-          backgroundColor: "rgba(37, 99, 235, 0.12)",
-          tension: 0.35,
-          fill: true
+          borderColor: "#2563eb", // Azul fuerte
+          borderWidth: 3,
+          tension: 0.2,
+          fill: false
         },
         {
           label: "Potencia Aparente",
           data: buildChartData(records, metrics.potenciaAparente),
-          borderColor: "#3b82f6",
-          backgroundColor: "rgba(59, 130, 246, 0.12)",
-          tension: 0.35,
-          fill: true
+          borderColor: "#1e293b", // Pizarra oscuro / Negro neutro
+          borderWidth: 3,
+          tension: 0.2,
+          fill: false
         }
       ];
 
@@ -576,26 +577,26 @@
         {
           label: "Factor de Potencia",
           data: buildChartData(records, metrics.factorPotencia),
-          borderColor: "#0f766e",
-          backgroundColor: "rgba(15, 118, 110, 0.12)",
-          tension: 0.35,
-          fill: true
+          borderColor: "#0d9488", // Teal / Turquesa oscuro
+          borderWidth: 3,
+          tension: 0.2,
+          fill: false
         },
         {
           label: "THD",
           data: buildChartData(records, metrics.thd),
-          borderColor: "#b45309",
-          backgroundColor: "rgba(180, 83, 9, 0.12)",
-          tension: 0.35,
-          fill: true
+          borderColor: "#ea580c", // Naranja brillante
+          borderWidth: 3,
+          tension: 0.2,
+          fill: false
         },
         {
           label: "Energía Consumida",
           data: buildChartData(records, metrics.energiaConsumida),
-          borderColor: "#14b8a6",
-          backgroundColor: "rgba(20, 184, 166, 0.12)",
-          tension: 0.35,
-          fill: true
+          borderColor: "#7c3aed", // Morado / Violeta
+          borderWidth: 3,
+          tension: 0.2,
+          fill: false
         }
       ];
 
@@ -635,7 +636,6 @@
         return;
       }
 
-      // Descargamos un volumen mayor (150) para garantizar que entren todos los tipos de variables recientes
       const { data, error } = await supabaseClient
         .from("mediciones")
         .select("*")
@@ -648,8 +648,6 @@
         document.getElementById("historyTable").innerHTML = `<tr><td colspan="5">${error.message}</td></tr>`;
         return;
       }
-
-      console.log("Datos recibidos de Supabase:", data);
 
       if (!data || data.length === 0) {
         document.getElementById("statusLabel").innerHTML = `<span class="badge warning">Tabla sin datos</span>`;
