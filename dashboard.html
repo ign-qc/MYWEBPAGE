@@ -227,21 +227,14 @@
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      padding: 0.35rem 0.7rem;
+      padding: 0.35rem 0.7Camp;
       border-radius: 999px;
       font-weight: 700;
       font-size: 0.8rem;
     }
 
-    .badge.success {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .badge.warning {
-      background: #fef3c7;
-      color: #92400e;
-    }
+    .badge.success { background: #dcfce7; color: #166534; }
+    .badge.warning { background: #fef3c7; color: #92400e; }
 
     .dashboard-footer {
       padding: 1rem 0 2rem;
@@ -250,13 +243,8 @@
     }
 
     @media (max-width: 900px) {
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .metric-grid {
-        grid-template-columns: 1fr;
-      }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .metric-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -264,9 +252,9 @@
   <div class="container">
     <header class="dashboard-header">
       <div>
-        <span class="eyebrow">Monitoreo Energético</span>
-        <h1>Panel de Control</h1>
-        <p>Visualiza potencia activa, reactiva, aparente, factor de potencia, THD, energía y costos en tiempo real.</p>
+        <span class="eyebrow" id="dashboardSubtitlePre">Monitoreo Energético</span>
+        <h1 id="dashboardTitle">Panel de Control</h1>
+        <p id="dashboardDescription">Visualiza potencia activa, reactiva, aparente, factor de potencia, THD, energía y costos en tiempo real.</p>
       </div>
       <button class="button button-secondary" onclick="logout()">Cerrar sesión</button>
     </header>
@@ -286,62 +274,62 @@
 
         <div class="metric-grid">
           <div class="metric-card">
-            <strong>Potencia Activa</strong>
+            <strong id="titleM1">Potencia Activa</strong>
             <span id="potenciaActiva">-- kW</span>
           </div>
           <div class="metric-card">
-            <strong>Potencia Reactiva</strong>
+            <strong id="titleM2">Potencia Reactiva</strong>
             <span id="potenciaReactiva">-- kVAR</span>
           </div>
           <div class="metric-card">
-            <strong>Potencia Aparente</strong>
+            <strong id="titleM3">Potencia Aparente</strong>
             <span id="potenciaAparente">-- kVA</span>
           </div>
           <div class="metric-card">
-            <strong>Factor de Potencia</strong>
+            <strong id="titleM4">Factor de Potencia</strong>
             <span id="factorPotencia">--</span>
           </div>
           <div class="metric-card">
-            <strong>THD</strong>
+            <strong id="titleM5">THD</strong>
             <span id="thd">-- %</span>
           </div>
           <div class="metric-card">
-            <strong>Energía Consumida</strong>
+            <strong id="titleM6">Energía Consumida</strong>
             <span id="energiaConsumida">-- kWh</span>
           </div>
         </div>
       </section>
 
-      <section class="panel-card">
+      <section class="panel-card" id="sidebarPanel">
         <div class="panel-header">
-          <h2>Costos y multas</h2>
+          <h2 id="sidebarTitle">Costos y multas</h2>
         </div>
 
         <div>
           <div class="input-row">
-            <label for="precioKwh">Precio del kWh</label>
+            <label for="precioKwh" id="labelPrice">Precio del kWh</label>
             <input id="precioKwh" type="number" min="0" step="10" value="150" />
           </div>
 
           <div class="info-card">
             <div class="info-item">
-              <strong>Consumo actual</strong>
+              <strong id="labelEnergyItem">Consumo actual</strong>
               <span id="energyValue">-- kWh</span>
             </div>
             <div class="info-item">
-              <strong>Costo estimado</strong>
+              <strong id="labelCostItem">Costo estimado</strong>
               <span id="totalCost">-- CLP</span>
             </div>
             <div class="info-item">
-              <strong>Multa factor de potencia</strong>
+              <strong id="labelPenalty1">Multa factor de potencia</strong>
               <span id="penaltyPF">--</span>
             </div>
             <div class="info-item">
-              <strong>Multa THD</strong>
+              <strong id="labelPenalty2">Multa THD</strong>
               <span id="penaltyTHD">--</span>
             </div>
             <div class="info-item">
-              <strong>Costo total proyectado</strong>
+              <strong id="labelTotalItem">Costo total proyectado</strong>
               <span id="finalCost">-- CLP</span>
             </div>
           </div>
@@ -354,11 +342,11 @@
         </div>
         <div class="charts-grid">
           <div class="chart-card">
-            <h3>Potencias activas y reactivas</h3>
+            <h3 id="chartTitle1">Potencias activas y reactivas</h3>
             <canvas id="powerChart"></canvas>
           </div>
           <div class="chart-card">
-            <h3>Factor de potencia, THD y energía</h3>
+            <h3 id="chartTitle2">Factor de potencia, THD y energía</h3>
             <canvas id="qualityChart"></canvas>
           </div>
         </div>
@@ -389,7 +377,7 @@
     </main>
 
     <footer class="dashboard-footer">
-      <p>Datos de energía actualizados automáticamente cada 10 segundos.</p>
+      <p id="footerText">Datos de energía actualizados automáticamente cada 10 segundos.</p>
     </footer>
   </div>
 
@@ -403,13 +391,11 @@
       if (window.supabase && typeof window.supabase.createClient === "function") {
         return window.supabase.createClient(SUPABASE_URL, API_KEY);
       }
-      if (typeof window.createClient === "function") {
-        return window.createClient(SUPABASE_URL, API_KEY);
-      }
       return null;
     })();
 
-    const metrics = {
+    // Mapeos globales de Tags según tipo de aplicación
+    const metricsEnergy = {
       potenciaActiva: "P_ACT",
       potenciaReactiva: "P_REACT",
       potenciaAparente: "P_APP",
@@ -417,6 +403,17 @@
       thd: "THD",
       energiaConsumida: "E_ACT"
     };
+
+    const metricsWater = {
+      caudal: "CAUDAL",
+      nivelEstanque: "NIVEL",
+      ph: "PH",
+      turbiedad: "TURB",
+      presion: "PRESION",
+      volumenTotal: "VOL_ACT"
+    };
+
+    let appType = "energia"; // Por defecto
 
     function formatNumber(value, decimals = 2) {
       if (value === null || value === undefined || Number.isNaN(value)) return "--";
@@ -435,13 +432,19 @@
     }
 
     function getStatusLabel(values) {
-      if (values.potenciaActiva === null && values.energiaConsumida === null) return "Sin datos";
-      if (values.factorPotencia !== null && values.factorPotencia < 0.9) return "Atención: Factor bajo";
-      if (values.thd !== null && values.thd > 5) return "Atención: THD alto";
+      if (appType === "energia") {
+        if (values.potenciaActiva === null && values.energiaConsumida === null) return "Sin datos";
+        if (values.factorPotencia !== null && values.factorPotencia < 0.9) return "Atención: FP bajo";
+        if (values.thd !== null && values.thd > 5) return "Atención: THD alto";
+      } else {
+        if (values.caudal === null && values.nivelEstanque === null) return "Sin datos";
+        if (values.ph !== null && (values.ph < 6.5 || values.ph > 8.5)) return "Fuera de Rango PH";
+      }
       return "Estable";
     }
 
     function updateCostView(values) {
+      if (appType !== "energia") return;
       const price = Number(document.getElementById("precioKwh").value);
       const energy = values.energiaConsumida ?? 0;
       const baseCost = energy * price;
@@ -457,17 +460,31 @@
     }
 
     function renderMetrics(values) {
-      document.getElementById("potenciaActiva").textContent = values.potenciaActiva !== null ? `${formatNumber(values.potenciaActiva, 2)} kW` : "-- kW";
-      document.getElementById("potenciaReactiva").textContent = values.potenciaReactiva !== null ? `${formatNumber(values.potenciaReactiva, 2)} kVAR` : "-- kVAR";
-      document.getElementById("potenciaAparente").textContent = values.potenciaAparente !== null ? `${formatNumber(values.potenciaAparente, 2)} kVA` : "-- kVA";
-      document.getElementById("factorPotencia").textContent = values.factorPotencia !== null ? formatNumber(values.factorPotencia, 3) : "--";
-      document.getElementById("thd").textContent = values.thd !== null ? `${formatNumber(values.thd, 2)} %` : "-- %";
-      document.getElementById("energiaConsumida").textContent = values.energiaConsumida !== null ? `${formatNumber(values.energiaConsumida, 2)} kWh` : "-- kWh";
-      document.getElementById("updatedAt").textContent = new Date().toLocaleString("es-CL");
-      
       const status = getStatusLabel(values);
-      const badgeType = values.factorPotencia !== null && values.factorPotencia < 0.9 ? "warning" : values.thd !== null && values.thd > 5 ? "warning" : "success";
-      document.getElementById("statusLabel").innerHTML = `<span class="badge ${badgeType}">${status}</span>`;
+      document.getElementById("updatedAt").textContent = new Date().toLocaleString("es-CL");
+
+      if (appType === "energia") {
+        document.getElementById("potenciaActiva").textContent = values.potenciaActiva !== null ? `${formatNumber(values.potenciaActiva, 2)} kW` : "-- kW";
+        document.getElementById("potenciaReactiva").textContent = values.potenciaReactiva !== null ? `${formatNumber(values.potenciaReactiva, 2)} kVAR` : "-- kVAR";
+        document.getElementById("potenciaAparente").textContent = values.potenciaAparente !== null ? `${formatNumber(values.potenciaAparente, 2)} kVA` : "-- kVA";
+        document.getElementById("factorPotencia").textContent = values.factorPotencia !== null ? formatNumber(values.factorPotencia, 3) : "--";
+        document.getElementById("thd").textContent = values.thd !== null ? `${formatNumber(values.thd, 2)} %` : "-- %";
+        document.getElementById("energiaConsumida").textContent = values.energiaConsumida !== null ? `${formatNumber(values.energiaConsumida, 2)} kWh` : "-- kWh";
+        
+        const badgeType = (values.factorPotencia !== null && values.factorPotencia < 0.9) || (values.thd !== null && values.thd > 5) ? "warning" : "success";
+        document.getElementById("statusLabel").innerHTML = `<span class="badge ${badgeType}">${status}</span>`;
+      } else {
+        // Renderizado para agua reutilizando los ID de los contenedores
+        document.getElementById("potenciaActiva").textContent = values.caudal !== null ? `${formatNumber(values.caudal, 2)} L/min` : "-- L/min";
+        document.getElementById("potenciaReactiva").textContent = values.nivelEstanque !== null ? `${formatNumber(values.nivelEstanque, 1)} %` : "-- %";
+        document.getElementById("potenciaAparente").textContent = values.ph !== null ? formatNumber(values.ph, 2) : "--";
+        document.getElementById("factorPotencia").textContent = values.turbiedad !== null ? `${formatNumber(values.turbiedad, 2)} NTU` : "-- NTU";
+        document.getElementById("thd").textContent = values.presion !== null ? `${formatNumber(values.presion, 2)} PSI` : "-- PSI";
+        document.getElementById("energiaConsumida").textContent = values.volumenTotal !== null ? `${formatNumber(values.volumenTotal, 1)} m³` : "-- m³";
+        
+        const badgeType = (values.ph !== null && (values.ph < 6.5 || values.ph > 8.5)) ? "warning" : "success";
+        document.getElementById("statusLabel").innerHTML = `<span class="badge ${badgeType}">${status}</span>`;
+      }
     }
 
     function renderHistory(records) {
@@ -479,23 +496,18 @@
 
       body.innerHTML = records.map(record => {
         const date = new Date(record.fecha).toLocaleString("es-CL");
-        const variable = record.variable || "-";
-        const unit = record.unidad || "";
         return `
           <tr>
             <td>${date}</td>
             <td>${record.dispositivo || "-"}</td>
-            <td>${variable}</td>
+            <td>${record.variable || "-"}</td>
             <td>${record.valor ?? "-"}</td>
-            <td>${unit}</td>
+            <td>${record.unidad || ""}</td>
           </tr>`;
       }).join("");
     }
 
-    const chartConfig = {
-      powerChart: null,
-      qualityChart: null
-    };
+    const chartConfig = { powerChart: null, qualityChart: null };
 
     function buildChartData(records, tag) {
       if (!records) return [];
@@ -514,8 +526,7 @@
         .filter(record => record.tag && String(record.tag).trim().toUpperCase() === String(tag).trim().toUpperCase())
         .map(record => {
           const dateObj = new Date(record.fecha);
-          if (isNaN(dateObj.getTime())) return new Date().toLocaleTimeString("es-CL");
-          return dateObj.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+          return isNaN(dateObj.getTime()) ? new Date().toLocaleTimeString("es-CL") : dateObj.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
         })
         .reverse();
     }
@@ -530,8 +541,7 @@
           maintainAspectRatio: false,
           interaction: { mode: "index", intersect: false },
           plugins: {
-            legend: { labels: { color: "#14213d", font: { weight: 'bold' } } },
-            tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.formattedValue}` } }
+            legend: { labels: { color: "#14213d", font: { weight: 'bold' } } }
           },
           scales: {
             x: { ticks: { color: "#4a5d79" }, grid: { color: "rgba(29, 78, 216, 0.08)" } },
@@ -542,79 +552,114 @@
     }
 
     function updateCharts(records) {
-      const labelsPower = buildLabels(records, metrics.potenciaActiva);
-      const labelsQuality = buildLabels(records, metrics.factorPotencia);
+      if (chartConfig.powerChart) { chartConfig.powerChart.destroy(); }
+      if (chartConfig.qualityChart) { chartConfig.qualityChart.destroy(); }
 
-      // Paleta limpia, distinguible y SIN relleno inferior
-      const powerDatasets = [
-        {
-          label: "Potencia Activa",
-          data: buildChartData(records, metrics.potenciaActiva),
-          borderColor: "#dc2626", // Rojo vivo
-          borderWidth: 3,
-          tension: 0.2,
-          fill: false
-        },
-        {
-          label: "Potencia Reactiva",
-          data: buildChartData(records, metrics.potenciaReactiva),
-          borderColor: "#2563eb", // Azul fuerte
-          borderWidth: 3,
-          tension: 0.2,
-          fill: false
-        },
-        {
-          label: "Potencia Aparente",
-          data: buildChartData(records, metrics.potenciaAparente),
-          borderColor: "#1e293b", // Pizarra oscuro / Negro neutro
-          borderWidth: 3,
-          tension: 0.2,
-          fill: false
-        }
-      ];
+      if (appType === "energia") {
+        const labelsPower = buildLabels(records, metricsEnergy.potenciaActiva);
+        const labelsQuality = buildLabels(records, metricsEnergy.factorPotencia);
 
-      const qualityDatasets = [
-        {
-          label: "Factor de Potencia",
-          data: buildChartData(records, metrics.factorPotencia),
-          borderColor: "#0d9488", // Teal / Turquesa oscuro
-          borderWidth: 3,
-          tension: 0.2,
-          fill: false
-        },
-        {
-          label: "THD",
-          data: buildChartData(records, metrics.thd),
-          borderColor: "#ea580c", // Naranja brillante
-          borderWidth: 3,
-          tension: 0.2,
-          fill: false
-        },
-        {
-          label: "Energía Consumida",
-          data: buildChartData(records, metrics.energiaConsumida),
-          borderColor: "#7c3aed", // Morado / Violeta
-          borderWidth: 3,
-          tension: 0.2,
-          fill: false
-        }
-      ];
+        const powerDatasets = [
+          { label: "Potencia Activa", data: buildChartData(records, metricsEnergy.potenciaActiva), borderColor: "#dc2626", borderWidth: 3, tension: 0.2, fill: false },
+          { label: "Potencia Reactiva", data: buildChartData(records, metricsEnergy.potenciaReactiva), borderColor: "#2563eb", borderWidth: 3, tension: 0.2, fill: false },
+          { label: "Potencia Aparente", data: buildChartData(records, metricsEnergy.potenciaAparente), borderColor: "#1e293b", borderWidth: 3, tension: 0.2, fill: false }
+        ];
 
-      if (chartConfig.powerChart) {
-        chartConfig.powerChart.data.labels = labelsPower;
-        chartConfig.powerChart.data.datasets = powerDatasets;
-        chartConfig.powerChart.update();
-      } else {
+        const qualityDatasets = [
+          { label: "Factor de Potencia", data: buildChartData(records, metricsEnergy.factorPotencia), borderColor: "#0d9488", borderWidth: 3, tension: 0.2, fill: false },
+          { label: "THD", data: buildChartData(records, metricsEnergy.thd), borderColor: "#ea580c", borderWidth: 3, tension: 0.2, fill: false },
+          { label: "Energía Consumida", data: buildChartData(records, metricsEnergy.energiaConsumida), borderColor: "#7c3aed", borderWidth: 3, tension: 0.2, fill: false }
+        ];
+
         chartConfig.powerChart = createChart("powerChart", powerDatasets, labelsPower);
+        chartConfig.qualityChart = createChart("qualityChart", qualityDatasets, labelsQuality);
+      } else {
+        // Configuración de gráficos para Agua
+        const labelsWater1 = buildLabels(records, metricsWater.caudal);
+        const labelsWater2 = buildLabels(records, metricsWater.nivelEstanque);
+
+        const waterDatasets1 = [
+          { label: "Caudal (L/min)", data: buildChartData(records, metricsWater.caudal), borderColor: "#06b6d4", borderWidth: 3, tension: 0.2, fill: false },
+          { label: "Presión (PSI)", data: buildChartData(records, metricsWater.presion), borderColor: "#3b82f6", borderWidth: 3, tension: 0.2, fill: false }
+        ];
+
+        const waterDatasets2 = [
+          { label: "Nivel Estanque (%)", data: buildChartData(records, metricsWater.nivelEstanque), borderColor: "#10b981", borderWidth: 3, tension: 0.2, fill: false },
+          { label: "pH", data: buildChartData(records, metricsWater.ph), borderColor: "#f59e0b", borderWidth: 3, tension: 0.2, fill: false },
+          { label: "Volumen (m³)", data: buildChartData(records, metricsWater.volumenTotal), borderColor: "#6366f1", borderWidth: 3, tension: 0.2, fill: false }
+        ];
+
+        chartConfig.powerChart = createChart("powerChart", waterDatasets1, labelsWater1);
+        chartConfig.qualityChart = createChart("qualityChart", waterDatasets2, labelsWater2);
+      }
+    }
+
+    function transformarPantallaParaAgua() {
+      appType = "agua";
+      document.getElementById("dashboardSubtitlePre").textContent = "Analítica de Fluidos";
+      document.getElementById("dashboardTitle").textContent = "Monitoreo Hidráulico";
+      document.getElementById("dashboardDescription").textContent = "Visualiza caudal, nivel de estanques, pH, turbiedad, presión y volúmenes hídricos en tiempo real.";
+      
+      // Renombrar Tarjetas
+      document.getElementById("titleM1").textContent = "Caudal Actual";
+      document.getElementById("titleM2").textContent = "Nivel de Estanque";
+      document.getElementById("titleM3").textContent = "pH Solución";
+      document.getElementById("titleM4").textContent = "Turbiedad";
+      document.getElementById("titleM5").textContent = "Presión de Red";
+      document.getElementById("titleM6").textContent = "Volumen Acumulado";
+
+      // Renombrar Gráficos
+      document.getElementById("chartTitle1").textContent = "Dinámica de Caudal y Presión";
+      document.getElementById("chartTitle2").textContent = "Nivel, Acumulado y Calidad (pH)";
+
+      // Ocultar sección de costos de energía
+      document.getElementById("sidebarPanel").style.display = "none";
+      document.querySelector(".dashboard-grid").style.gridTemplateColumns = "1fr";
+      document.getElementById("footerText").textContent = "Datos de analítica de agua actualizados automáticamente cada 10 segundos.";
+    }
+
+    async function obtenerDatos() {
+      if (!supabaseClient) return;
+      const targetTable = (appType === "energia") ? "mediciones" : "mediciones_agua";
+
+      const { data, error } = await supabaseClient
+        .from(targetTable)
+        .select("*")
+        .order("fecha", { ascending: false })
+        .limit(150);
+
+      if (error) {
+        console.error("Error al obtener datos:", error);
+        return;
       }
 
-      if (chartConfig.qualityChart) {
-        chartConfig.qualityChart.data.labels = labelsQuality;
-        chartConfig.qualityChart.data.datasets = qualityDatasets;
-        chartConfig.qualityChart.update();
+      if (!data || data.length === 0) return;
+
+      let values = {};
+      if (appType === "energia") {
+        values = {
+          potenciaActiva: getMetricValue(data, metricsEnergy.potenciaActiva),
+          potenciaReactiva: getMetricValue(data, metricsEnergy.potenciaReactiva),
+          potenciaAparente: getMetricValue(data, metricsEnergy.potenciaAparente),
+          factorPotencia: getMetricValue(data, metricsEnergy.factorPotencia),
+          thd: getMetricValue(data, metricsEnergy.thd),
+          energiaConsumida: getMetricValue(data, metricsEnergy.energiaConsumida)
+        };
+        updateCostView(values);
       } else {
-        chartConfig.qualityChart = createChart("qualityChart", qualityDatasets, labelsQuality);
+        values = {
+          caudal: getMetricValue(data, metricsWater.caudal),
+          nivelEstanque: getMetricValue(data, metricsWater.nivelEstanque),
+          ph: getMetricValue(data, metricsWater.ph),
+          turbiedad: getMetricValue(data, metricsWater.turbiedad),
+          presion: getMetricValue(data, metricsWater.presion),
+          volumenTotal: getMetricValue(data, metricsWater.volumenTotal)
+        };
       }
+
+      renderMetrics(values);
+      renderHistory(data.slice(0, 12));
+      updateCharts(data);
     }
 
     async function checkSession() {
@@ -630,67 +675,52 @@
       return true;
     }
 
-    async function obtenerDatos() {
-      if (!supabaseClient) {
-        document.getElementById("updatedAt").textContent = "Error de conexión";
-        return;
-      }
-
-      const { data, error } = await supabaseClient
-        .from("mediciones")
-        .select("*")
-        .order("fecha", { ascending: false })
-        .limit(150);
-
-      if (error) {
-        console.error("Error al obtener datos:", error);
-        document.getElementById("statusLabel").textContent = "Error al cargar datos";
-        document.getElementById("historyTable").innerHTML = `<tr><td colspan="5">${error.message}</td></tr>`;
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        document.getElementById("statusLabel").innerHTML = `<span class="badge warning">Tabla sin datos</span>`;
-        return;
-      }
-
-      const values = {
-        potenciaActiva: getMetricValue(data, metrics.potenciaActiva),
-        potenciaReactiva: getMetricValue(data, metrics.potenciaReactiva),
-        potenciaAparente: getMetricValue(data, metrics.potenciaAparente),
-        factorPotencia: getMetricValue(data, metrics.factorPotencia),
-        thd: getMetricValue(data, metrics.thd),
-        energiaConsumida: getMetricValue(data, metrics.energiaConsumida)
-      };
-
-      renderMetrics(values);
-      updateCostView(values);
-      renderHistory(data.slice(0, 12));
-      updateCharts(data);
-    }
-
     async function logout() {
-      if (supabaseClient && supabaseClient.auth && typeof supabaseClient.auth.signOut === "function") {
-        await supabaseClient.auth.signOut();
-      }
+      if (supabaseClient && supabaseClient.auth) { await supabaseClient.auth.signOut(); }
       window.location.href = "iot-login.html";
     }
 
-    document.getElementById("precioKwh").addEventListener("input", () => {
-      const values = {
-        energiaConsumida: Number(document.getElementById("energiaConsumida").textContent.replace(/[^0-9.-]+/g, "")) || 0,
-        factorPotencia: Number(document.getElementById("factorPotencia").textContent.replace(/[^0-9.-]+/g, "")) || null,
-        thd: Number(document.getElementById("thd").textContent.replace(/[^0-9.-]+/g, "")) || null
-      };
-      updateCostView(values);
-    });
+    if (document.getElementById("precioKwh")) {
+      document.getElementById("precioKwh").addEventListener("input", () => {
+        if (appType !== "energia") return;
+        const values = {
+          energiaConsumida: Number(document.getElementById("energiaConsumida").textContent.replace(/[^0-9.-]+/g, "")) || 0,
+          factorPotencia: Number(document.getElementById("factorPotencia").textContent.replace(/[^0-9.-]+/g, "")) || null,
+          thd: Number(document.getElementById("thd").textContent.replace(/[^0-9.-]+/g, "")) || null
+        };
+        updateCostView(values);
+      });
+    }
 
     async function init() {
       const valid = await checkSession();
       if (!valid) return;
       
-      await obtenerDatos();
-      setInterval(obtenerDatos, 10000);
+      try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        
+        const { data: perfil, error } = await supabaseClient
+          .from('perfiles_usuarios')
+          .select('aplicacion_asignada')
+          .eq('user_id', user.id)
+          .single();
+          
+        if (error || !perfil) {
+          document.body.innerHTML = "<div style='padding:3rem;text-align:center;'><h2>Error: Usuario sin rol o aplicación configurada. Contacte soporte.</h2></div>";
+          return;
+        }
+
+        if (perfil.aplicacion_asignada === 'energia') {
+          appType = "energia";
+        } else if (perfil.aplicacion_asignada === 'agua') {
+          transformarPantallaParaAgua();
+        }
+
+        await obtenerDatos();
+        setInterval(obtenerDatos, 10000);  
+      } catch (err) {
+        console.error("Fallo crítico en init:", err);
+      }
     }
 
     init();
