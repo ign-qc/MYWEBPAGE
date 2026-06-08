@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Evita que Google indexe imágenes sueltas si no quieres, o déjalo todo abierto:
+Allow: /images/
+
+# Dirección de tu mapa del sitio para que los robots lo encuentren solos
+Sitemap: https://iqcontrol.cl/sitemap.xml
